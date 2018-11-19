@@ -2,6 +2,15 @@ import numpy as np
 from PIL import Image
 import math
 
+JPEG_QUANTIZATION_TABLE_8 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
+                                      [12, 12, 14, 19, 26, 58, 60, 55],
+                                      [14, 13, 16, 24, 40, 57, 69, 56],
+                                      [14, 17, 22, 29, 51, 87, 80, 62],
+                                      [18, 22, 37, 56, 68, 109, 103, 77],
+                                      [24, 35, 55, 64, 81, 104, 113, 92],
+                                      [49, 64, 78, 87, 103, 121, 120, 101],
+                                      [72, 92, 95, 98, 112, 100, 103, 99]])
+
 
 def zigzag(block):
     """
@@ -32,6 +41,7 @@ def DCT(block):
     """
     D = get_dct_matrix(block.shape[0])
 
+    # D * A * D'
     return np.matmul(np.matmul(D, block), D.transpose())
 
 
@@ -41,6 +51,7 @@ def iDCT(block):
     """
     D = get_dct_matrix(block.shape[0])
 
+    # D' * A * D
     return np.matmul(np.matmul(D.transpose(), block), D)
 
 
@@ -48,27 +59,36 @@ def quantization(block):
     """
     Quantize on a copy of block
     """
-    table_8 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
-                        [12, 12, 14, 19, 26, 58, 60, 55],
-                        [14, 13, 16, 24, 40, 57, 69, 56],
-                        [14, 17, 22, 29, 51, 87, 80, 62],
-                        [18, 22, 37, 56, 68, 109, 103, 77],
-                        [24, 35, 55, 64, 81, 104, 113, 92],
-                        [49, 64, 78, 87, 103, 121, 120, 101],
-                        [72, 92, 95, 98, 112, 100, 103, 99]])
-
     if block.shape[0] == 8:
-        return np.round(block / table_8)
+        return np.round(block / JPEG_QUANTIZATION_TABLE_8)
 
     table_16 = np.zeros((16, 16))
     for i in range(8):
         for j in range(8):
-            table_16[2 * i][2 * j] = table_8[i][j]
-            table_16[2 * i + 1][2 * j] = table_8[i][j]
-            table_16[2 * i][2 * j + 1] = table_8[i][j]
-            table_16[2 * i + 1][2 * j + 1] = table_8[i][j]
+            table_16[2 * i][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i + 1][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
 
     return np.round(block / table_16)
+
+
+def reverse_quantization(block):
+    """
+    Reverse quantize on a copy of block
+    """
+    if block.shape[0] == 8:
+        return np.round(block * JPEG_QUANTIZATION_TABLE_8)
+
+    table_16 = np.zeros((16, 16))
+    for i in range(8):
+        for j in range(8):
+            table_16[2 * i][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i + 1][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
+            table_16[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
+
+    return np.round(block * table_16)
 
 
 def load_image(path_image):
