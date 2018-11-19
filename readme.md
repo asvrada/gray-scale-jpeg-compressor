@@ -19,4 +19,27 @@
  72  92  95  98 112 100 103  99
  ```
  
+ # Design
+ 
+ ## Compression
+ 
+ We are dealing with grayscale images. So some steps are skipped.
+ 
+ First:  
+ Block splitting (with options: 8x8, 16x16, pad with zero)
+ 
+ Then for each block, do:
+ 
+ 1. Level adjustment (subtract 128 from each byte)
+ 3. DCT
+ 4. Quantization
+ 5. 2D -> 1D (zigzag odd)
+ 5. Encode DCT coefficients
+    1. For DC component: 
+    2. For AC components: run-length encoding, with (0, 0) indicates the end of a block
+ 6. Encode with external programs
+ 
+ ## Decompress
+ 
+Reveres
  
