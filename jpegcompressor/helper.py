@@ -2,16 +2,8 @@ import numpy as np
 from PIL import Image
 import math
 from bitarray import bitarray
-from collections import deque
-
-JPEG_QUANTIZATION_TABLE_8 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
-                                      [12, 12, 14, 19, 26, 58, 60, 55],
-                                      [14, 13, 16, 24, 40, 57, 69, 56],
-                                      [14, 17, 22, 29, 51, 87, 80, 62],
-                                      [18, 22, 37, 56, 68, 109, 103, 77],
-                                      [24, 35, 55, 64, 81, 104, 113, 92],
-                                      [49, 64, 78, 87, 103, 121, 120, 101],
-                                      [72, 92, 95, 98, 112, 100, 103, 99]])
+from .huffman import huffman_encode_to_bitarray, huffman_decode
+from .constants import JPEG_QUANTIZATION_TABLE_8
 
 
 def zigzag(matrix):
@@ -50,6 +42,7 @@ def zigzag(matrix):
 
 
 def reverse_zigzag(array):
+    # todo
     pass
 
 
@@ -78,11 +71,7 @@ def encode_coefficient(array, prev_dc):
     """
     Encdoe DC and AC coefficient
 
-    First step:
-    encode into list of tuple (run, size, amplitude), while the first element is going to be (size, amplitude) since it's DC coe
-
-    Second step:
-    Encode the list from first step into bitarray
+    Encode into list of tuple (run, size, amplitude), while the first element is going to be (size, amplitude) since it's DC coe
 
     :param array: array of int
     :type array: np.ndarray
@@ -96,7 +85,9 @@ def encode_coefficient(array, prev_dc):
         """
         Encode AC coe
         tuple: ((runlength, size), amplitude)
-            where runlength and size are constrained to 4 bits
+                where runlength is constrained to 4 bits, and size is huffman coded, amplitude is one's complement representation
+            runlength: number of zero coe preceding this element
+            size: number of bits requred to represent amplitude
 
         Special code:
             eob: (0, 0)
@@ -104,47 +95,27 @@ def encode_coefficient(array, prev_dc):
 
         :param runlength: time the element repeated
         :type runlength: int
-        :param element: the AC coe
+        :param element: the AC amplitude
         :type element: int
         :return: encoded AC eoe
         :rtype: bitarray
         """
-
+        # If there are more than 15 preceding zeros
         if runlength > max_runlength:
-            if element == 0:
-                return zrl + convert_ac_to_bitarray(runlength - max_runlength, 0)
-
-            # for element other than 0
-            return convert_ac_to_bitarray(max_runlength, element) + convert_ac_to_bitarray(runlength - max_runlength, element)
+            return zrl + convert_ac_to_bitarray(runlength - max_runlength, element)
 
         b_runlength = bitarray("{:04b}".format(runlength))
         b_ac = convert_amp_to_bitarray(element)
-        b_size = bitarray("{:04b}".format(len(b_ac)))
+        b_size = huffman_encode_to_bitarray(len(b_ac))
 
         return b_runlength + b_size + b_ac
 
     if len(array) not in [8 * 8, 16 * 16]:
         raise "Length of array to encode is not valid: got {}".format(len(array))
 
-    # the huffman table for encoding the size of DC / AC coe
-    huffman_table_size = {
-        0: "00",
-        1: "010",
-        2: "011",
-        3: "100",
-        4: "101",
-        5: "110",
-        6: "1110",
-        7: "11110",
-        8: "111110",
-        9: "1111110",
-        10: "11111110",
-        11: "111111110"
-    }
-
     # special code for encoding AC coe
-    eob = bitarray("00000000")
-    zrl = bitarray("11110000")
+    eob = bitarray("000000")
+    zrl = bitarray("111100")
     max_runlength = 15
 
     result = bitarray()
@@ -155,43 +126,38 @@ def encode_coefficient(array, prev_dc):
 
     # use one's complement representation
     b_diff = convert_amp_to_bitarray(diff)
-    b_size = bitarray(huffman_table_size[len(b_diff)])
+    b_size = huffman_encode_to_bitarray(len(b_diff))
 
+    # store results
     result.extend(b_size)
     result.extend(b_diff)
 
-    # Then encode AC
-    prev = None
+    # Second
+    # encode AC
     count = 0
     for ac in array[1:]:
-        if not prev:
-            prev = ac
-            count = 1
-            continue
-
-        # same element, increment count
-        if prev == ac:
+        # zero, increment count
+        if ac == 0:
             count += 1
             continue
 
-        # different number, encode prev
-        result.extend(convert_ac_to_bitarray(count, prev))
-        count = 1
-        prev = ac
+        # not zero, encode prev
+        result.extend(convert_ac_to_bitarray(count, ac))
+        # reset count
+        count = 0
 
-    # encode whats left
-    if prev == 0:
-        result.extend(eob)
-    else:
-        result.extend(convert_ac_to_bitarray(count, prev))
+    # add end of block
+    result.extend(eob)
 
     return result
 
 
-def decode_coefficient(todo):
+def decode_coefficient(bit_array, prev_dc):
     """
     todo
     """
+    # build a tree to decode huffman code
+
     pass
 
 
