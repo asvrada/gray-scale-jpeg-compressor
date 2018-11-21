@@ -239,7 +239,6 @@ def load_image(path_image):
 
 def split_image(pix, im, block_size=8):
     """
-    todo: 长宽顺序反了
     A generator that split a image into blocks and return one block at a time
     :param pix: the pix object
     :param im: the im object
@@ -248,7 +247,7 @@ def split_image(pix, im, block_size=8):
     :return: one block of a image
     :rtype: numpy.darray
     """
-    height, width = im.size
+    width, height = im.size
 
     num_block_x = math.ceil(height / block_size)
     num_block_y = math.ceil(width / block_size)
@@ -268,7 +267,8 @@ def split_image(pix, im, block_size=8):
                         continue
 
                     # assign color
-                    block[i][j] = pix[img_i, img_j]
+                    # we reverse the index here because the coordinate for an image is different than for a 2D matrix
+                    block[i][j] = pix[img_j, img_i]
 
             # yield one block
             yield block

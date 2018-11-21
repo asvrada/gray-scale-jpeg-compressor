@@ -43,5 +43,5 @@ def check_steps():
 
 
 if __name__ == '__main__':
-    check_steps()
+    # check_steps()
     run()
