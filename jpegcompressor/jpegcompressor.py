@@ -1,3 +1,5 @@
+from bitarray import bitarray
+
 from .helper import *
 
 LEVEL_ADJUSTMENT = 128
@@ -18,11 +20,14 @@ def compress(path_image, block_size=8):
     :param block_size: size of the DCT block, could be 8(8x8) or 16(16x16)
     :type block_size int
     :return: compressed image
-    :rtype: bytearray
+    :rtype: bitarray
     """
     pix, im = load_image(path_image)
 
-    result = bytearray()
+    result = bitarray()
+
+    # DC coefficient of the preceding block
+    prev_dc = 0
 
     for block in split_image(pix, im, block_size):
         # For each block, do:
@@ -30,29 +35,18 @@ def compress(path_image, block_size=8):
         # DCT
         # Quantization
         # 2D -> 1D
+        # encode DC and AC coefficients
 
-        # 1. Level adjustment
         block -= LEVEL_ADJUSTMENT
-
-        # 2. DCT
         block = DCT(block)
-
-        # 3. Quantization
         block = quantization(block)
-
-        # 4. 2D -> 1D
         array = zigzag(block)
 
+        # encode DC and AC
+        encoded = encode_coefficient(array, prev_dc)
+
         # output result
-        # todo: not right!
-        result.extend(array)
+        result.extend(encoded)
 
-    pass
+    return result
 
-
-if __name__ == '__main__':
-    test_image = "../images/test.bmp"
-    pix, im = load_image(test_image)
-    ret = list(split_image(pix, im))
-
-    print(len(ret))
