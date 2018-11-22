@@ -1,8 +1,7 @@
 from bitarray import bitarray
 
+from .config import *
 from .helper import *
-
-LEVEL_ADJUSTMENT = 128
 
 
 # Entry for Compression
@@ -48,5 +47,41 @@ def compress(path_image, block_size=8):
         # output result
         result.extend(encoded)
 
+    # add end of image bits
+    result.extend("00")
     return result
 
+
+def decompress(path_data, bit_array=None):
+    # todo: store block x, y info
+    if bit_array is None:
+        array = load_bitarray(path_data)
+    else:
+        array = bit_array
+
+    prev_dc = 0
+    pos = 0
+
+    # clamp value between 0, 255
+    blocks = list()
+
+    while pos < len(array):
+        # check if end of image
+        # because 00 represents huffman encoded size 0
+        if array[pos:pos + 2] == bitarray("00"):
+            break
+
+        pos, coefficients = decode_coefficient(array, pos, prev_dc)
+
+        # store previous DC coe
+        prev_dc = coefficients[0]
+
+        block = reverse_zigzag(coefficients)
+        block = reverse_quantization(block)
+        block = iDCT(block)
+        block += LEVEL_ADJUSTMENT
+
+        blocks.append(block)
+
+    # todo: restore image
+    return blocks

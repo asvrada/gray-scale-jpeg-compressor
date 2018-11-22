@@ -2,8 +2,9 @@ import numpy as np
 from PIL import Image
 import math
 from bitarray import bitarray
-from .huffman import huffman_encode_to_bitarray, huffman_decode
-from .constants import JPEG_QUANTIZATION_TABLE_8
+
+from .config import *
+from .huffman import *
 
 
 def zigzag(matrix):
@@ -42,8 +43,34 @@ def zigzag(matrix):
 
 
 def reverse_zigzag(array):
-    # todo
-    pass
+    r, c = 0, 0
+    tmp_size = round(math.sqrt(len(array)))
+    x, y = tmp_size, tmp_size
+
+    ret = np.zeros((x * y,), dtype=int).reshape((x, y))
+
+    for i in range(x * y):
+        # ret[i] = matrix[r][c]
+        ret[r][c] = array[i]
+
+        if (r + c) % 2 == 0:
+            if c == y - 1:
+                r += 1
+            elif r == 0:
+                c += 1
+            else:
+                r -= 1
+                c += 1
+        else:
+            if r == x - 1:
+                c += 1
+            elif c == 0:
+                r += 1
+            else:
+                r += 1
+                c -= 1
+
+    return ret
 
 
 def convert_amp_to_bitarray(num):
@@ -65,6 +92,26 @@ def convert_amp_to_bitarray(num):
         b_arr ^= one
 
     return b_arr
+
+
+def revert_bitarray_to_amp(array):
+    """
+
+    :param array: bitarray
+    :type array: bitarray
+    :return:
+    :rtype: int
+    """
+    sign = True if not array[0] else False
+
+    # if negative, flip all the bits
+    if sign:
+        one = len(array) * bitarray('1')
+        array ^= one
+
+    num = int(array.to01(), 2)
+
+    return num if not sign else -num
 
 
 def encode_coefficient(array, prev_dc):
@@ -152,13 +199,61 @@ def encode_coefficient(array, prev_dc):
     return result
 
 
-def decode_coefficient(bit_array, prev_dc):
+def decode_coefficient(array, pos, prev_dc):
     """
-    todo
-    """
-    # build a tree to decode huffman code
+    Decode the bitarray and construct the coefficients
 
-    pass
+    :param array:
+    :type array: bitarray
+    :param pos: starting index
+    :type pos: int
+    :param prev_dc:
+    :type prev_dc: int
+    :return: the coefficients
+    :rtype: (int, np.ndarray)
+    """
+    coefficients = list()
+
+    # first, decode DC
+    pos, size = huffman_decode(array, pos)
+
+    diff = revert_bitarray_to_amp(array[pos:pos + size])
+    pos += size
+
+    dc = prev_dc + diff
+    coefficients.append(dc)
+
+    # move cursor forward
+
+    # Second: decode AC
+    while True:
+        # first 4 bits are runlength
+        runlength = int(array[pos:pos + 4].to01(), 2)
+        pos += 4
+
+        # next huffman coded size
+        pos, size = huffman_decode(array, pos)
+
+        # todo: check for special code
+        # check eob
+        if runlength == 0 and size == 0:
+            # fill 0
+            num_zero = 64 - len(coefficients)
+            coefficients.extend([0] * num_zero)
+            break
+
+        if runlength == 15 and size == 0:
+            coefficients.extend([0] * 15)
+            continue
+
+        # then amplitude with size determined by huffman coded size
+        ac = revert_bitarray_to_amp(array[pos:pos + size])
+        pos += size
+
+        coefficients.extend([0] * runlength)
+        coefficients.append(ac)
+
+    return pos, np.array(coefficients)
 
 
 def get_dct_matrix(N):
@@ -192,7 +287,7 @@ def iDCT(block):
     D = get_dct_matrix(block.shape[0])
 
     # D' * A * D
-    return np.matmul(np.matmul(D.transpose(), block), D)
+    return np.round(np.matmul(np.matmul(D.transpose(), block), D))
 
 
 def quantization(block):
@@ -218,7 +313,7 @@ def reverse_quantization(block):
     Reverse quantize on a copy of block
     """
     if block.shape[0] == 8:
-        return np.round(block * JPEG_QUANTIZATION_TABLE_8)
+        return block * JPEG_QUANTIZATION_TABLE_8
 
     table_16 = np.zeros((16, 16))
     for i in range(8):
@@ -228,13 +323,21 @@ def reverse_quantization(block):
             table_16[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
             table_16[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
 
-    return np.round(block * table_16)
+    return block * table_16
 
 
 def load_image(path_image):
     im = Image.open(path_image)
     pix = im.load()
     return pix, im
+
+
+def load_bitarray(path_data):
+    f = open(path_data, "rb")
+
+    ret = bitarray()
+    ret.fromfile(f)
+    return ret
 
 
 def split_image(pix, im, block_size=8):

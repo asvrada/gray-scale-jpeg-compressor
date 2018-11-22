@@ -1,8 +1,18 @@
-import numpy as np
 from bitarray import bitarray
+import numpy as np
+
+LEVEL_ADJUSTMENT = 128
+
+
+class TreeNode:
+    def __init__(self, val=None):
+        self.val = val
+        self.left = None
+        self.right = None
+
 
 # the huffman table for encoding the size of DC / AC coe
-HUFFMAN_TABLE = {
+HUFFMAN_TABLE_ENCODE = {
     0: "00",
     1: "010",
     2: "011",
@@ -18,7 +28,9 @@ HUFFMAN_TABLE = {
 }
 
 # convert into bitarray
-HUFFMAN_TABLE = {v: bitarray(k) for v, k in HUFFMAN_TABLE.items()}
+HUFFMAN_TABLE_ENCODE = {v: bitarray(k) for v, k in HUFFMAN_TABLE_ENCODE.items()}
+
+HUFFMAN_TABLE_DECODE_ROOT = None
 
 JPEG_QUANTIZATION_TABLE_8 = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
                                       [12, 12, 14, 19, 26, 58, 60, 55],
