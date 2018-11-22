@@ -8,9 +8,42 @@ from .huffman import *
 
 
 def encode_image_shape(size):
-    # todo
-    return []
-    pass
+    """
+    Encode image shape, 16 bits for each value
+
+    :param size: a tuple contains (height, width)
+    :type size: tuple
+    :return: encoded height and width of the image
+    :rtype: bitarray
+    """
+    height, width = size
+
+    if height >= 2 ** 16 or width >= 2 ** 16:
+        raise "Image too big, can't compress!"
+
+    b_height = "{:016b}".format(height)
+    b_width = "{:016b}".format(width)
+    return bitarray(b_height + b_width)
+
+
+def decode_image_shape(array, pos):
+    """
+    decode image shape from bitarray, starting from pos
+
+    :param array: as usual, don't modify this array
+    :type array: bitarray
+    :param pos: starting index
+    :type pos: int
+    :return: a tuple of (pos, (height, weight))
+    :rtype: (int, (int, int))
+    """
+    # we konw that each takes 16 bits
+    height = int(array[pos:pos + 16].to01(), 2)
+    width = int(array[pos + 16:pos + 32].to01(), 2)
+
+    pos += 32
+
+    return pos, (height, width)
 
 
 def zigzag(matrix):
@@ -56,7 +89,6 @@ def reverse_zigzag(array):
     ret = np.zeros((x * y,), dtype=int).reshape((x, y))
 
     for i in range(x * y):
-        # ret[i] = matrix[r][c]
         ret[r][c] = array[i]
 
         if (r + c) % 2 == 0:
@@ -120,7 +152,7 @@ def revert_bitarray_to_amp(array):
     return num if not sign else -num
 
 
-def encode_coefficient(array, prev_dc):
+def encode_coefficient(array):
     """
     Encdoe DC and AC coefficient
 
@@ -128,8 +160,6 @@ def encode_coefficient(array, prev_dc):
 
     :param array: array of int
     :type array: np.ndarray
-    :param prev_dc: DC coe of previous block
-    :type prev_dc: int
     :return: encoded DC and AC coefficient
     :rtype: bitarray
     """
@@ -175,7 +205,7 @@ def encode_coefficient(array, prev_dc):
 
     # First
     # encode DC first
-    diff = array[0] - prev_dc
+    diff = array[0]
 
     # use one's complement representation
     b_diff = convert_amp_to_bitarray(diff)
@@ -229,8 +259,6 @@ def decode_coefficient(array, pos, prev_dc):
     dc = prev_dc + diff
     coefficients.append(dc)
 
-    # move cursor forward
-
     # Second: decode AC
     while True:
         # first 4 bits are runlength
@@ -240,7 +268,6 @@ def decode_coefficient(array, pos, prev_dc):
         # next huffman coded size
         pos, size = huffman_decode(array, pos)
 
-        # todo: check for special code
         # check eob
         if runlength == 0 and size == 0:
             # fill 0
@@ -248,6 +275,7 @@ def decode_coefficient(array, pos, prev_dc):
             coefficients.extend([0] * num_zero)
             break
 
+        # check zrl
         if runlength == 15 and size == 0:
             coefficients.extend([0] * 15)
             continue
@@ -381,3 +409,19 @@ def split_image(pix, im, block_size=8):
 
             # yield one block
             yield block
+
+
+def fill_image(draw, block, block_index, image_size):
+    block_size = block.shape[0]
+    x, y = block_index
+    height, width = image_size
+
+    for i in range(block_size):
+        for j in range(block_size):
+            img_i, img_j = i + block_size * x, j + block_size * y
+
+            if img_i >= height or img_j >= width:
+                continue
+
+            # fill
+            draw.point([(img_j, img_i)], fill=int(block[i][j]))

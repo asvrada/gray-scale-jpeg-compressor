@@ -25,7 +25,7 @@ def check_steps():
     block = quantization(block)
     array = zigzag(block)
 
-    result = encode_coefficient(array, 0)
+    result = encode_coefficient(array)
 
     _, decode_array = decode_coefficient(result, 0)
     decode_block = reverse_zigzag(decode_array)
@@ -38,8 +38,9 @@ def check_steps():
 
 if __name__ == '__main__':
     # check_steps()
-    test_image = "images/test.bmp"
-    result = compress(test_image)
+    test_image = "images/grayscale/Kodak08gray.bmp"
+    # test_image = "images/test.bmp"
+    array = compress_to_bitarray(test_image)
 
-    result = decompress("", result)
-    print(result)
+    result = decompress_bitarray(array)
+    result.save("output.bmp", "bmp")
