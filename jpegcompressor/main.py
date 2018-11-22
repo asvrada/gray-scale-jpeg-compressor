@@ -77,12 +77,8 @@ def decompress_bitarray(array):
     prev_dc = 0
 
     count = 0
-    while True:
-        # check if end of image
-        # because 00 represents huffman encoded size 0
-        if array[pos:pos + 2] == bitarray("00"):
-            break
-
+    N = len(array)
+    while N - pos >= 8:
         pos, coefficients = decode_coefficient(array, pos, prev_dc)
 
         # store previous DC coe
@@ -113,6 +109,7 @@ def decompress_bitarray(array):
     return im
 
 
-def decompress_from_file(path_data):
-    array = load_bitarray(path_data)
-    return decompress_bitarray(array)
+def decompress_data_to_file(file_in, file_out):
+    array = load_bitarray(file_in)
+    im = decompress_bitarray(array)
+    im.save(file_out, "bmp")
