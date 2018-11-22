@@ -114,12 +114,16 @@ def reverse_zigzag(array):
 def convert_amp_to_bitarray(num):
     """
     Convert the amplitude into bitarray using 1's complement
+    todo: bug
 
     :param num: the number
     :type num: int
     :return: The 1's complement representation of the given number
     :rtype: bitarray
     """
+    if num == 0:
+        return bitarray()
+
     sign = True if num < 0 else False
 
     b_arr = bitarray("{:b}".format(abs(num)))
@@ -134,12 +138,16 @@ def convert_amp_to_bitarray(num):
 
 def revert_bitarray_to_amp(array):
     """
+    todo: bug
 
     :param array: bitarray
     :type array: bitarray
     :return:
     :rtype: int
     """
+    if len(array) == 0:
+        return 0
+
     sign = True if not array[0] else False
 
     # if negative, flip all the bits

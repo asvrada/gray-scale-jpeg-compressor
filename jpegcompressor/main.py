@@ -83,7 +83,6 @@ def decompress_bitarray(array):
         if array[pos:pos + 2] == bitarray("00"):
             break
 
-        # todo: bug with encode/decode
         pos, coefficients = decode_coefficient(array, pos, prev_dc)
 
         # store previous DC coe
