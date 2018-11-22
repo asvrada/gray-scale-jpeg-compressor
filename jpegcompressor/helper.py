@@ -7,6 +7,12 @@ from .config import *
 from .huffman import *
 
 
+def encode_image_shape(size):
+    # todo
+    return []
+    pass
+
+
 def zigzag(matrix):
     """
     Flattern 2D matrix to 1D array, in a zigzag manner (odds)

@@ -24,6 +24,9 @@ def compress(path_image, block_size=8):
     pix, im = load_image(path_image)
 
     result = bitarray()
+    # encode height and width
+    y, x = im.size
+    result.extend(encode_image_shape((x, y)))
 
     # DC coefficient of the preceding block
     prev_dc = 0
@@ -83,5 +86,5 @@ def decompress(path_data, bit_array=None):
 
         blocks.append(block)
 
-    # todo: restore image
+    # todo: restore image from blocks
     return blocks

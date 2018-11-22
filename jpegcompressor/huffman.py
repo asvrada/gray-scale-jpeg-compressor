@@ -16,45 +16,37 @@ def huffman_encode_to_bitarray(num):
     return HUFFMAN_TABLE_ENCODE[num]
 
 
-def create_huffman_decode_tree(root, pattern, val):
+def build_huffman_decode_tree():
     """
-    Create huffman decode tree
-    # True: goto left child
-    # False: goto right child
+    Build huffman decode tree from the specified huffman encode table
 
-    :param root: the huffman tree root
-    :type root: TreeNode
-    :param pattern: the huffman code
-    :type pattern: bitarray
-    :param val: The value for the final TreeNode
-    :type val: int
-    :return: Created TreeNode
+    :return: the root of the decode tree
     :rtype: TreeNode
     """
-    if not root:
-        root = TreeNode()
 
-    if len(pattern) == 0:
-        # end of pattern
-        root.val = val
+    def helper(root, pattern, val):
+        if not root:
+            root = TreeNode()
+
+        if len(pattern) == 0:
+            # end of pattern
+            root.val = val
+            return root
+
+        # if is True
+        if pattern[0]:
+            # goto left child
+            root.left = helper(root.left, pattern[1:], val)
+        else:
+            root.right = helper(root.right, pattern[1:], val)
+
         return root
 
-    # if is True
-    if pattern[0]:
-        # goto left child
-        root.left = create_huffman_decode_tree(root.left, pattern[1:], val)
-    else:
-        root.right = create_huffman_decode_tree(root.right, pattern[1:], val)
-
-    return root
-
-
-def build_huffman_decode_tree():
     root = None
 
     # if tree is not constructed, build one first
     for val, pattern in HUFFMAN_TABLE_ENCODE.items():
-        root = create_huffman_decode_tree(root, pattern, val)
+        root = helper(root, pattern, val)
 
     return root
 
