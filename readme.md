@@ -32,15 +32,20 @@
  
  1. Level adjustment (subtract 128 from each byte)
  3. DCT
- 4. Quantization
+ 4. Quantization then round to nearest int
  5. 2D -> 1D (zigzag odd)
  5. Encode DCT coefficients
-    1. For DC component: 
+    1. For DC component: Differential encoding
     2. For AC components: run-length encoding, with (0, 0) indicates the end of a block
- 6. Encode with external programs
+ 6. Compress whats left with external programs
+    1. Compress
+    2. gzip
+    3. Compressor from HW1
  
  ## Decompress
- 
-Reveres
- 
- todo: something wrong with decode coe
+
+Do above steps in reverse order.
+
+# Performance
+
+To experiment with your program on the test data, you will need to be able to compare the quality of the decompressed image as compared to the original using the PSNR measure. You should make your own program to do this.

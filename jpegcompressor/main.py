@@ -70,15 +70,15 @@ def decompress_bitarray(array):
     im = Image.new("L", (width, height))
     draw = ImageDraw.Draw(im)
 
-    # find out number of blocks per row
-    block_size = None
-    num_block_y = None
+    # This two variable will be updated on the first run of the below while loop
+    # They are set to 1 only to pass the while condition check
+    num_block_x = 1
+    num_block_y = 1
 
     prev_dc = 0
 
     count = 0
-    N = len(array)
-    while N - pos >= 8:
+    while count != num_block_x * num_block_y:
         pos, coefficients = decode_coefficient(array, pos, prev_dc)
 
         # store previous DC coe
@@ -93,9 +93,11 @@ def decompress_bitarray(array):
         # clamp value between 0, 255
         block = np.clip(block, 0, 255)
 
-        # we only know the size of block after decoded one block
-        if block_size is None:
+        # wfollowing code excuted during the first loop
+        if count == 0:
+            # Size of block is only needed here
             block_size = block.shape[0]
+            num_block_x = math.ceil(height / block_size)
             num_block_y = math.ceil(width / block_size)
 
         # draw this block into image
@@ -103,13 +105,19 @@ def decompress_bitarray(array):
         block_y = count % num_block_y
         fill_image(draw, block, (block_x, block_y), (height, width))
 
-        # finally
+        # finally, increment count
         count += 1
 
     return im
 
 
-def decompress_data_to_file(file_in, file_out):
+def compress_to_file(file_in, file_out, block_size=8):
+    array = compress_to_bitarray(file_in, block_size)
+    with open(file_out, "wb") as f:
+        f.write(array.tobytes())
+
+
+def decompress_to_file(file_in, file_out):
     array = load_bitarray(file_in)
     im = decompress_bitarray(array)
     im.save(file_out, "bmp")
