@@ -6,17 +6,17 @@ desc = """
 Gray-scale only JPEG [De]Compressor by Zijie Wu
 
 Example usage:
-    For compression:
+    For compression: [DEFAULT]
         python cli.py -c image1.bmp image2.bmp ...
     For decompression: 
-        python cli.py -d compressed.file1 compressed.file2 ...
+        python cli.py -d image1.cjpg image2.cjpg ...
 """
 
 parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
 
 parser.add_argument("-c", "--compress", dest="do_compress", help="[DEFAULT] Compress input file.", action="store_true")
 parser.add_argument("-d", "--decompress", dest="do_decompress", help="Decompress input file.", action="store_true")
-parser.add_argument("files", help="Files to compress or decompress", nargs="+")
+parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="+")
 parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
 
 argv = parser.parse_args()
