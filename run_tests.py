@@ -4,7 +4,7 @@ if __name__ == '__main__':
     test_image = "images/grayscale/Kodak09gray.bmp"
     output = "output.cjpg"
 
-    # compress_to_file(test_image, output)
+    compress_to_file(test_image, output, 8)
 
     decompress_to_file(output, "output.bmp")
 

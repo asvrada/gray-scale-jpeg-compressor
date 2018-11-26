@@ -241,7 +241,7 @@ def encode_coefficient(array):
     return result
 
 
-def decode_coefficient(array, pos, prev_dc):
+def decode_coefficient(array, pos, prev_dc, block_size):
     """
     Decode the bitarray and construct the coefficients
 
@@ -251,6 +251,8 @@ def decode_coefficient(array, pos, prev_dc):
     :type pos: int
     :param prev_dc:
     :type prev_dc: int
+    :param block_size:
+    :type block_size: int
     :return: the coefficients
     :rtype: (int, np.ndarray)
     """
@@ -277,7 +279,7 @@ def decode_coefficient(array, pos, prev_dc):
         # check eob
         if runlength == 0 and size == 0:
             # fill 0
-            num_zero = 64 - len(coefficients)
+            num_zero = block_size ** 2 - len(coefficients)
             coefficients.extend([0] * num_zero)
             break
 

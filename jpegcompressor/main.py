@@ -26,6 +26,11 @@ def compress_to_bitarray(path_image, block_size=8):
     pix, im = load_image(path_image)
 
     result = bitarray()
+    # encode block size
+    # 8: bit "0"
+    # 16: bit "1"
+    result.append(block_size == 16)
+
     # encode height and width
     y, x = im.size
     result.extend(encode_image_shape((x, y)))
@@ -64,22 +69,24 @@ def compress_to_bitarray(path_image, block_size=8):
 
 
 def decompress_bitarray(array):
-    pos, (height, width) = decode_image_shape(array, 0)
+    # decode block size
+    block_size = 16 if array[0] else 8
+
+    pos = 1
+    pos, (height, width) = decode_image_shape(array, pos)
 
     # L: black and white
     im = Image.new("L", (width, height))
     draw = ImageDraw.Draw(im)
 
-    # This two variable will be updated on the first run of the below while loop
-    # They are set to 1 only to pass the while condition check
-    num_block_x = 1
-    num_block_y = 1
+    num_block_x = math.ceil(height / block_size)
+    num_block_y = math.ceil(width / block_size)
 
     prev_dc = 0
 
     count = 0
     while count != num_block_x * num_block_y:
-        pos, coefficients = decode_coefficient(array, pos, prev_dc)
+        pos, coefficients = decode_coefficient(array, pos, prev_dc, block_size)
 
         # store previous DC coe
         prev_dc = coefficients[0]
@@ -92,13 +99,6 @@ def decompress_bitarray(array):
 
         # clamp value between 0, 255
         block = np.clip(block, 0, 255)
-
-        # wfollowing code excuted during the first loop
-        if count == 0:
-            # Size of block is only needed here
-            block_size = block.shape[0]
-            num_block_x = math.ceil(height / block_size)
-            num_block_y = math.ceil(width / block_size)
 
         # draw this block into image
         block_x = count // num_block_y
