@@ -4,6 +4,20 @@
 > Date: 11/13/2018  
 > Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG.html)
 
+A gray-scale image compressor, can only compress images in .bmp format.
+
+# How to use
+
+```bash
+# To compress gray-scale bmp image
+python cli.py -c image.bmp
+
+# To decompress
+python cli.py -d image.cjpg.S
+```
+
+# Design
+
 **JPEG Luminence Quantization Matrix**
 
 (From Table K.1 of the JPEG standard.) 
@@ -18,8 +32,6 @@
  49  64  78  87 103 121 120 101
  72  92  95  98 112 100 103  99
  ```
- 
- # Design
  
  ## Compression
  

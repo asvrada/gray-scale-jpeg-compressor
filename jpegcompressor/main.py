@@ -62,9 +62,6 @@ def compress_to_bitarray(path_image, block_size=8):
         # output result
         result.extend(encoded)
 
-    # add end of image bits
-    result.extend("00")
-
     return result
 
 
