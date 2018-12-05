@@ -342,7 +342,7 @@ def iDCT(block):
     return np.round(np.matmul(np.matmul(D.transpose(), block), D))
 
 
-def quantization(block):
+def quantization(block, quality="low"):
     """
     Quantize on a copy of block
     """
@@ -360,7 +360,7 @@ def quantization(block):
     return np.round(block / table_16)
 
 
-def reverse_quantization(block):
+def reverse_quantization(block, quality="low"):
     """
     Reverse quantize on a copy of block
     """
@@ -385,6 +385,14 @@ def load_image(path_image):
 
 
 def load_bitarray(path_data):
+    """
+    Load bitarray from file
+
+    :param path_data:
+    :type path_data: str
+    :return: bitarray
+    :rtype: bitarray
+    """
     f = open(path_data, "rb")
 
     ret = bitarray()
