@@ -10,6 +10,12 @@ A gray-scale image compressor, can only compress images in .bmp format.
 # How to use
 
 ```bash
+# First:
+cd /path/to/this/repo/
+
+# To print help
+python cli.py -h
+
 # To compress gray-scale bmp image
 python cli.py -c image.bmp
 
@@ -62,18 +68,10 @@ The **JPEG Luminence Quantization Matrix** used on low quality setting.
  ```
  
 ### Medium and High quality
-The code to generate medium and high quantization table.
- 
-```python
-def generate_quantization_table(q):
-    A = np.zeros((8, 8))
 
-    for i in range(1, 9):
-        for j in range(1, 9):
-            A[i - 1][j - 1] = 1 + q * (i + j - 1)
+Other quality are derived from above table, multiplied with a constant Q
 
-    return A
-```
+
 ## Compression
  
 We are dealing with grayscale images. So its easy.
