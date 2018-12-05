@@ -2,7 +2,8 @@
 
 > Author: Zijie Wu  
 > Date: 11/13/2018  
-> Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG.html)
+> Page Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG.html)  
+> GitHub: [here](https://github.com/asvrada/jpeg)
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
@@ -18,7 +19,34 @@ python cli.py -d image.cjpg.S
 
 # Design
 
-**JPEG Luminence Quantization Matrix**
+## Huffman table
+
+```python
+# the huffman table for [de]encoding the size of DC / AC coefficients
+HUFFMAN_TABLE_ENCODE = {
+    0: "00",
+    1: "010",
+    2: "011",
+    3: "100",
+    4: "101",
+    5: "110",
+    6: "1110",
+    7: "11110",
+    8: "111110",
+    9: "1111110",
+    10: "11111110",
+    11: "111111110"
+}
+```
+
+## Quality Levels:
+
+1. Low, PSNR ~30
+2. Medium, PSNR ~40
+3. High, PSNR ~50
+
+### Low quality
+The **JPEG Luminence Quantization Matrix** used on low quality setting.
 
 (From Table K.1 of the JPEG standard.) 
 
@@ -33,14 +61,27 @@ python cli.py -d image.cjpg.S
  72  92  95  98 112 100 103  99
  ```
  
- ## Compression
+### Medium and High quality
+The code to generate medium and high quantization table.
  
- We are dealing with grayscale images. So some steps are skipped.
+```python
+def generate_quantization_table(q):
+    A = np.zeros((8, 8))
+
+    for i in range(1, 9):
+        for j in range(1, 9):
+            A[i - 1][j - 1] = 1 + q * (i + j - 1)
+
+    return A
+```
+## Compression
  
- First:  
- Block splitting (with options: 8x8, 16x16, pad with zero)
+We are dealing with grayscale images. So its easy.
  
- Then for each block, do:
+First:  
+Block splitting (with options: 8x8, 16x16, pad with zero)
+ 
+Then for each block, do:
  
  1. Level adjustment (subtract 128 from each byte)
  3. DCT
@@ -54,10 +95,15 @@ python cli.py -d image.cjpg.S
     2. gzip
     3. Compressor from HW1
  
- ## Decompress
-
+## Decompression
+ 
 Do above steps in reverse order.
 
-# Performance
 
-To experiment with your program on the test data, you will need to be able to compare the quality of the decompressed image as compared to the original using the PSNR measure. You should make your own program to do this.
+# Implementation Details
+
+Use bitarray to store results. They can be easily converted to bytes then store to file, as well as read from file as bytes then creat bitarray from them.
+
+Build own huffman decode tree for huffman decoding.
+
+

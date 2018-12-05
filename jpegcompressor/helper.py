@@ -7,6 +7,16 @@ from .config import *
 from .huffman import *
 
 
+def generate_quantization_table(q):
+    A = np.zeros((8, 8))
+
+    for i in range(1, 9):
+        for j in range(1, 9):
+            A[i - 1][j - 1] = 1 + q * (i + j - 1)
+
+    return A
+
+
 def encode_image_shape(size):
     """
     Encode image shape, 16 bits for each value

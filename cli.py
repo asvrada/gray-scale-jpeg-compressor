@@ -32,6 +32,7 @@ parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawD
 
 parser.add_argument("-c", "--compress", dest="do_compress", help="[DEFAULT] Compress input file.", action="store_true")
 parser.add_argument("-d", "--decompress", dest="do_decompress", help="Decompress input file.", action="store_true")
+parser.add_argument("--skip", dest="skip", help="Skip lossless compression.", action="store_true")
 parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="+")
 parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
 
@@ -39,6 +40,7 @@ argv = parser.parse_args()
 
 do_compress = argv.do_compress
 do_decompress = argv.do_decompress
+skip = argv.skip
 input_files = argv.files
 size = argv.size
 
@@ -71,7 +73,7 @@ if do_compress:
         compress_with_hw1(out_file)
 
         # remove intermediate cjpg
-        os.remove(out_file)
+        # os.remove(out_file)
 
 elif do_decompress:
     print(">>> Decompressing...")
