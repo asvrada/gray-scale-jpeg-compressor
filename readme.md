@@ -72,7 +72,7 @@ The **JPEG Luminence Quantization Matrix** used on low quality setting.
 Other quality are derived from above table, divided by a constant Q
 
 * Q with low quality: 1
-* Q with medium quality: 10
+* Q with medium quality: 8
 * Q with high quality: 20
 
 

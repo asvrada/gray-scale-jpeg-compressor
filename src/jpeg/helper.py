@@ -366,7 +366,7 @@ def get_quantization_table(block_size, quality):
 
     # set other quality
     scalar = {
-        "medium": 10,
+        "medium": 8,
         "high": 20
     }
 

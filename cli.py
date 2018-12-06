@@ -1,5 +1,5 @@
-from jpegcompressor import jpeg
-from Compressor.compressor import Compressor
+from src.jpeg import jpeg
+from src.hw1.compressor import Compressor
 
 import argparse
 import os

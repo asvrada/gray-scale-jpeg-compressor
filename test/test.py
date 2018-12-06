@@ -1,5 +1,5 @@
-from jpegcompressor.config import *
-from jpegcompressor.helper import *
+from src.config import *
+from src.helper import *
 
 import numpy as np
 
