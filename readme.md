@@ -65,11 +65,15 @@ The **JPEG Luminence Quantization Matrix** used on low quality setting.
  24  35  55  64  81 104 113  92 
  49  64  78  87 103 121 120 101
  72  92  95  98 112 100 103  99
- ```
+```
  
 ### Medium and High quality
 
-Other quality are derived from above table, multiplied with a constant Q
+Other quality are derived from above table, divided by a constant Q
+
+* Q with low quality: 1
+* Q with medium quality: 10
+* Q with high quality: 20
 
 
 ## Compression
@@ -100,8 +104,16 @@ Do above steps in reverse order.
 
 # Implementation Details
 
-Use bitarray to store results. They can be easily converted to bytes then store to file, as well as read from file as bytes then creat bitarray from them.
+* Use numpy for most math operations on matrix.
+* Use PIL for image reading/writing.
+* Use bitarray to store results. They can be easily converted to bytes then store to file, as well as read from file as bytes then creat bitarray from them.
+* Build own huffman decode tree for huffman decoding/encoding.
 
-Build own huffman decode tree for huffman decoding.
+### File description: 
+
+* jpeg.py: Main file, where the main logic of compression/decompression happens
+* huffman.py: Involves huffman encoding/decoding
+* helper.py: A collections of functions that do specific things
+* config.py: Constants (like quantization table, huffman table) go there
 
 

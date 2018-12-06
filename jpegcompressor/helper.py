@@ -366,11 +366,11 @@ def get_quantization_table(block_size, quality):
 
     # set other quality
     scalar = {
-        "medium": 2,
-        "high": 3
+        "medium": 10,
+        "high": 20
     }
 
-    return np.round(mat / scalar[quality])
+    return np.clip(np.round(mat / scalar[quality]), 1, 200)
 
 
 def reverse_quantization(block, table):

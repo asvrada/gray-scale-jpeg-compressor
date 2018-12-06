@@ -36,6 +36,7 @@ Example usage:
     parser.add_argument("--skip", dest="skip", help="Skip lossless compression.", action="store_true")
     parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="+")
     parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
+    parser.add_argument("-q", "--quality", type=str, help="[DEFAULT: low] Define quality of JPEG image. One of {low, medium, high}", choices=["low", "medium", "high"], metavar='quality', default="low")
 
     argv = parser.parse_args()
 
@@ -44,6 +45,7 @@ Example usage:
     skip = argv.skip
     input_files = argv.files
     size = argv.size
+    quality = argv.quality
 
     if do_compress and do_decompress:
         parser.print_help()
@@ -53,10 +55,10 @@ Example usage:
     if not do_compress and not do_decompress:
         do_compress = True
 
-    return do_compress, do_decompress, skip, input_files, size
+    return do_compress, do_decompress, skip, input_files, size, quality
 
 
-def compress(input_files, size):
+def compress(input_files, size, quality):
     print(">>> Compressing...")
 
     for file in input_files:
@@ -71,7 +73,7 @@ def compress(input_files, size):
         tmp_file = ".".join(file.split(".")[:-1]) + ".cjpg"
 
         # compress with hw2
-        c = jpeg.Compressor(file, block_size=size).run()
+        c = jpeg.Compressor(file, block_size=size, quality=quality).run()
         c.write_to_file(tmp_file)
 
         # compress with hw1
@@ -106,7 +108,7 @@ def decompress(input_files):
         os.remove(tmp_file)
 
 
-def compress_skip(input_files, size):
+def compress_skip(input_files, size, quality):
     print(">>> Compressing and skip the lossless compression...")
 
     for file in input_files:
@@ -121,7 +123,7 @@ def compress_skip(input_files, size):
         tmp_file = ".".join(file.split(".")[:-1]) + ".cjpg"
 
         # compress with hw2
-        c = jpeg.Compressor(file, block_size=size).run()
+        c = jpeg.Compressor(file, block_size=size, quality=quality).run()
         c.write_to_file(tmp_file)
 
 
@@ -145,13 +147,13 @@ def decompress_skip(input_files):
 
 
 if __name__ == '__main__':
-    do_compress, do_decompress, skip, input_files, size = parse()
+    do_compress, do_decompress, skip, input_files, size, quality = parse()
 
     if do_compress:
         if not skip:
-            compress(input_files, size)
+            compress(input_files, size, quality)
         else:
-            compress_skip(input_files, size)
+            compress_skip(input_files, size, quality)
 
     elif do_decompress:
         if not skip:
