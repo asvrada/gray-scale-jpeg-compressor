@@ -367,7 +367,7 @@ def get_quantization_table(block_size, quality):
     # set other quality
     scalar = {
         "medium": 8,
-        "high": 20
+        "high": 10
     }
 
     return np.clip(np.round(mat / scalar[quality]), 1, 200)
