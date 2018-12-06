@@ -342,40 +342,42 @@ def iDCT(block):
     return np.round(np.matmul(np.matmul(D.transpose(), block), D))
 
 
-def quantization(block, quality="low"):
+def quantization(block, table):
     """
     Quantize on a copy of block
     """
-    if block.shape[0] == 8:
-        return np.round(block / JPEG_QUANTIZATION_TABLE_8)
-
-    table_16 = np.zeros((16, 16))
-    for i in range(8):
-        for j in range(8):
-            table_16[2 * i][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i + 1][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
-
-    return np.round(block / table_16)
+    return np.round(block / table)
 
 
-def reverse_quantization(block, quality="low"):
+def get_quantization_table(block_size, quality):
+    mat = JPEG_QUANTIZATION_TABLE_8
+
+    if block_size == 16:
+        mat = np.zeros((16, 16))
+        for i in range(8):
+            for j in range(8):
+                mat[2 * i][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+                mat[2 * i + 1][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
+                mat[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
+                mat[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
+
+    if quality == "low":
+        return mat
+
+    # set other quality
+    scalar = {
+        "medium": 2,
+        "high": 3
+    }
+
+    return np.round(mat / scalar[quality])
+
+
+def reverse_quantization(block, table):
     """
     Reverse quantize on a copy of block
     """
-    if block.shape[0] == 8:
-        return block * JPEG_QUANTIZATION_TABLE_8
-
-    table_16 = np.zeros((16, 16))
-    for i in range(8):
-        for j in range(8):
-            table_16[2 * i][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i + 1][2 * j] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
-            table_16[2 * i + 1][2 * j + 1] = JPEG_QUANTIZATION_TABLE_8[i][j]
-
-    return block * table_16
+    return block * table
 
 
 def load_image(path_image):

@@ -23,6 +23,7 @@ class Compressor:
         self.__result: bitarray = None
         self.__block_size = None
         self.__quality: str = None
+        self.__quantization_table = None
 
         # Init class variables
         # check block size
@@ -35,6 +36,7 @@ class Compressor:
             raise Exception("quality invalid")
 
         self.__quality = quality
+        self.__quantization_table = get_quantization_table(self.__block_size, self.__quality)
 
         self.__pix, self.__im = load_image(image_path)
         self.__result = bitarray()
@@ -57,7 +59,7 @@ class Compressor:
         for block in split_image(self.__pix, self.__im, self.__block_size):
             block -= LEVEL_ADJUSTMENT
             block = DCT(block)
-            block = quantization(block, self.__quality)
+            block = quantization(block, self.__quantization_table)
             array = zigzag(block)
 
             diff = array[0] - prev_dc
@@ -156,7 +158,9 @@ class Decompressor:
         self.__draw = None
 
         self.__quality: str = None
-        self.__block_size = None
+        self.__block_size: int = None
+        self.__quantization_table: np.ndarray = None
+
         self.__image_height = None
         self.__image_width = None
         self.__num_block_row = None
@@ -165,6 +169,8 @@ class Decompressor:
     def run(self):
         self.__read_quality()
         self.__read_block_size()
+        # we can get the quantization matrix from quality and block_size
+        self.__generate_quantization_table()
         self.__read_image_shape()
         self.__read_blocks()
 
@@ -207,6 +213,9 @@ class Decompressor:
 
         return self
 
+    def __generate_quantization_table(self):
+        self.__quantization_table = get_quantization_table(self.__block_size, self.__quality)
+
     def __read_image_shape(self):
         self.__pos, (self.__image_height, self.__image_width) = decode_image_shape(self.__array, self.__pos)
 
@@ -227,7 +236,7 @@ class Decompressor:
             prev_dc = coefficients[0]
 
             block = reverse_zigzag(coefficients)
-            block = reverse_quantization(block, self.__quality)
+            block = reverse_quantization(block, self.__quantization_table)
             block = iDCT(block)
             block += LEVEL_ADJUSTMENT
 
