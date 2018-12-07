@@ -3,11 +3,20 @@
 > Author: Zijie Wu  
 > Date: 11/13/2018  
 > Page Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG.html)  
-> GitHub: [here](https://github.com/asvrada/jpeg)
+> GitHub: [here](https://github.com/asvrada/gray-scale-jpeg-compressor)
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
 # How to use
+
+First, check dependencies.
+
+See file `requirements.txt`.
+
+* python >3.6
+* numpy
+* PIL (Pillow implementation)
+* bitarray
 
 ```bash
 # First:
