@@ -33,7 +33,7 @@ Example usage:
 
     parser.add_argument("-c", "--compress", dest="do_compress", help="[DEFAULT] Compress input file.", action="store_true")
     parser.add_argument("-d", "--decompress", dest="do_decompress", help="Decompress input file.", action="store_true")
-    parser.add_argument("--skip", dest="skip", help="Skip lossless compression.", action="store_true")
+    parser.add_argument("--noskip", dest="noskip", help="Do not skip lossless compression.", action="store_true")
     parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="+")
     parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
     parser.add_argument("-q", "--quality", type=str, help="[DEFAULT: low] Define quality of JPEG image. One of {low, medium, high}", choices=["low", "medium", "high"], metavar='quality', default="low")
@@ -42,7 +42,7 @@ Example usage:
 
     do_compress = argv.do_compress
     do_decompress = argv.do_decompress
-    skip = argv.skip
+    noskip = argv.noskip
     input_files = argv.files
     size = argv.size
     quality = argv.quality
@@ -55,7 +55,7 @@ Example usage:
     if not do_compress and not do_decompress:
         do_compress = True
 
-    return do_compress, do_decompress, skip, input_files, size, quality
+    return do_compress, do_decompress, noskip, input_files, size, quality
 
 
 def compress(input_files, size, quality):
@@ -147,16 +147,16 @@ def decompress_skip(input_files):
 
 
 if __name__ == '__main__':
-    do_compress, do_decompress, skip, input_files, size, quality = parse()
+    do_compress, do_decompress, noskip, input_files, size, quality = parse()
 
     if do_compress:
-        if not skip:
+        if noskip:
             compress(input_files, size, quality)
         else:
             compress_skip(input_files, size, quality)
 
     elif do_decompress:
-        if not skip:
+        if noskip:
             decompress(input_files)
         else:
             decompress_skip(input_files)
