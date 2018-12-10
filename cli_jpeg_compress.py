@@ -19,7 +19,7 @@ Example usage:
     parser.add_argument("--skip", dest="noskip", help="Skip lossless compression. Output file will be .cjpg format instead of .cjpg.S", action="store_true")
     parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="+")
     parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
-    parser.add_argument("-q", "--quality", type=str, help="[DEFAULT: low] Define quality of JPEG image. One of {low, medium, high}", choices=["low", "medium", "high"], metavar='quality', default="low")
+    parser.add_argument("-q", "--quality", type=str, help="[DEFAULT: medium] Define quality of JPEG image. One of {low, medium, high}", choices=["low", "medium", "high"], metavar='quality', default="medium")
 
     argv = parser.parse_args()
 
