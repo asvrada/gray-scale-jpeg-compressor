@@ -2,14 +2,14 @@
 
 > Author: Zijie Wu  
 > Date: 11/13/2018  
-> Page Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG.html)  
+> Page Link: [here](http://www.cs.brandeis.edu/%7Estorer/cs175/Assignments/ProjectJPEG/ProjectJPEG.html)  
 > GitHub: [here](https://github.com/asvrada/gray-scale-jpeg-compressor)
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
 # How to use
 
-First, check dependencies.
+## 1. check dependencies.
 
 See file `requirements.txt`.
 
@@ -17,6 +17,9 @@ See file `requirements.txt`.
 * numpy
 * PIL (Pillow implementation)
 * bitarray
+* PyInstaller
+
+## 2. Use as python script
 
 ```bash
 # First:
@@ -30,6 +33,25 @@ python cli.py -c image.bmp
 
 # To decompress
 python cli.py -d image.cjpg.S
+```
+
+## 3 Use as stand alone utilities
+
+### How to build executable
+
+Make sure PyInstaller is installed first.
+
+```bash
+pyinstaller --onefile cli_file_compress.py
+pyinstaller --onefile cli_file_decompress.py
+pyinstaller --onefile cli_jpeg_compress.py
+pyinstaller --onefile cli_jpeg_decompress.py
+```
+
+### Use executable as standard utility
+
+```bash
+./dist/cli_jpeg_compress ...
 ```
 
 # Design
@@ -125,4 +147,7 @@ Do above steps in reverse order.
 * helper.py: A collections of functions that do specific things
 * config.py: Constants (like quantization table, huffman table) go there
 
+# Change log for HW1
 
+* Bug fix in cli.py (there is a trivial bug in the HW1 I submitted)
+* Reduce the frequency of printing info about progress of compression

@@ -1,5 +1,3 @@
-from bitarray import bitarray
-
 from .config import *
 
 
@@ -66,14 +64,14 @@ def huffman_decode(array, pos):
     if HUFFMAN_TABLE_DECODE_ROOT is None:
         HUFFMAN_TABLE_DECODE_ROOT = build_huffman_decode_tree()
 
-    def helper(root, _pos):
+    def helper(root, tmp_pos):
         if root.val is not None:
-            return _pos, root.val
+            return tmp_pos, root.val
 
         # is True, goto left
-        if array[_pos]:
-            return helper(root.left, _pos + 1)
+        if array[tmp_pos]:
+            return helper(root.left, tmp_pos + 1)
         else:
-            return helper(root.right, _pos + 1)
+            return helper(root.right, tmp_pos + 1)
 
     return helper(HUFFMAN_TABLE_DECODE_ROOT, pos)

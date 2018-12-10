@@ -1,5 +1,4 @@
-from bitarray import bitarray
-from PIL import Image, ImageDraw
+from PIL import ImageDraw
 
 from .helper import *
 from .config import *

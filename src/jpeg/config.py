@@ -1,5 +1,5 @@
-from bitarray import bitarray
 import numpy as np
+from bitarray import bitarray
 
 LEVEL_ADJUSTMENT = 128
 

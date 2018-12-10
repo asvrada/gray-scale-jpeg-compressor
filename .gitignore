@@ -4,3 +4,6 @@
 output.bmp
 output/
 **/.pytest_cache
+*.spec
+dist
+build

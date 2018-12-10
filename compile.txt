@@ -1,0 +1,4 @@
+pyinstaller --onefile cli_file_compress.py
+pyinstaller --onefile cli_file_decompress.py
+pyinstaller --onefile cli_jpeg_compress.py
+pyinstaller --onefile cli_jpeg_decompress.py

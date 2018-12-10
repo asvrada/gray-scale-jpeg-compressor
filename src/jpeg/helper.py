@@ -1,9 +1,7 @@
 import numpy as np
 from PIL import Image
 import math
-from bitarray import bitarray
 
-from .config import *
 from .huffman import *
 
 
