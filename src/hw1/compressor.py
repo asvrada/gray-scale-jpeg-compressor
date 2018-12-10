@@ -202,9 +202,5 @@ class Decompressor:
         with open(output, "wb") as file:
             file.write(self.result)
 
-        return self
-
     def write_to_stdout(self):
         sys.stdout.buffer.write(self.result)
-        return self
-

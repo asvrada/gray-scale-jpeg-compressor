@@ -14,8 +14,7 @@ Example usage:
 
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("files", help="Files to compress", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
-    parser.add_argument("--size", type=int, help="Assign number of bits to sliding window\n9: 4K, 13: 64K", choices=[9, 13], metavar='size', default=9)
-
+    parser.add_argument("--size", type=int, help="Set number of bits to sliding window\nOptions [DEFAULT]9: 4K, 13: 64K", choices=[9, 13], metavar='size', default=9)
     argv = parser.parse_args()
 
     files = argv.files
@@ -33,7 +32,7 @@ def compress(files, size):
             # generate new file name
             output_file = filename + ".s"
 
-            # compress with hw2
+            # compress
             c = cc(file, size).run()
             c.write_to_file(output_file)
 

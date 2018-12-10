@@ -7,7 +7,8 @@
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
-> The compressor from HW1 runs slowly.
+> The compressor from HW1 runs slowly.  
+> The default quality for JPEG compression is MEDIUM.
 
 # How to use
 
@@ -34,14 +35,19 @@ See file `requirements.txt`.
 # First:
 cd /path/to/this/repo/
 
+# There are four scripts:
+
+# lossless compress/decompress
+cli_file_compress.py
+cli_file_decompress.py
+
+# JPEG compress/decompress
+cli_jpeg_compress.py
+cli_jpeg_decompress.py
+
 # To print help
-python cli.py -h
+python cli_*.py -h
 
-# To compress gray-scale bmp image
-python cli.py -c image.bmp
-
-# To decompress
-python cli.py -d image.cjpg.S
 ```
 
 ## 3 Use as stand alone utilities
@@ -158,5 +164,5 @@ Do above steps in reverse order.
 
 # Change log for HW1
 
-* Bug fix in cli.py (there is a trivial bug in the HW1 I submitted)
-* Reduce the frequency of printing info about progress of compression
+* Refactor the codes to work with stdin and stdout
+* Remove any printing

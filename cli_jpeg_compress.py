@@ -15,11 +15,9 @@ Example usage:
 """
 
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
-
     parser.add_argument("files", help="Path to gray-scale, bmp format images", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
     parser.add_argument("-s", "--size", type=int, help="[DEFAULT: 8] Define size of block, 8 or 16.", choices=[8, 16], metavar='size', default=8)
     parser.add_argument("-q", "--quality", type=str, help="[DEFAULT: medium] Define quality of JPEG image. One of {low, medium, high}", choices=["low", "medium", "high"], metavar='quality', default="medium")
-
     argv = parser.parse_args()
 
     buffered_reader = argv.files
@@ -35,17 +33,17 @@ def compress(buffered_reader, size, quality):
         for reader in buffered_reader:
             filename = reader.name
 
-            # process file name
+            # generate new file name
             output_file = ".".join(filename.split(".")[:-1]) + ".cjpg"
 
-            # compress with hw2
+            # compress
             c = jc(reader, block_size=size, quality=quality).run()
             c.write_to_file(output_file)
 
             # remove original file
             os.remove(filename)
     else:
-        # stdin
+        # read from stdin
         c = jc(buffered_reader, block_size=size, quality=quality).run()
         c.write_to_stdout()
 

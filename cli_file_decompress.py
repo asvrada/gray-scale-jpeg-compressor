@@ -14,7 +14,6 @@ Example usage:
 
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("files", help="Files to decompress", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
-
     argv = parser.parse_args()
 
     files = argv.files

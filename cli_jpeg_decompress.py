@@ -15,9 +15,7 @@ Example usage:
 """
 
     parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
-
     parser.add_argument("files", help="Path to cjpg format file", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
-
     argv = parser.parse_args()
 
     buffer = argv.files

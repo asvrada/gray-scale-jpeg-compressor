@@ -142,8 +142,6 @@ class Compressor:
         with open(path_output_file, "wb") as f:
             f.write(self.__result.tobytes())
 
-        return self
-
     def write_to_stdout(self):
         sys.stdout.buffer.write(self.__result.tobytes())
 
@@ -255,7 +253,6 @@ class Decompressor:
 
     def write_to_file(self, path_output_file):
         self.__im.save(path_output_file, "bmp")
-        return self
 
     def write_to_stdout(self):
         with io.BytesIO() as output:
