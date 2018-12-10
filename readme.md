@@ -7,7 +7,16 @@
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
+> The compressor from HW1 runs slowly.
+
 # How to use
+
+These scripts/utilities act like stand alone utilities. Where if a file is given as arguments, it will do its job and replace the file inplace.
+ 
+ For example: `./cli_jpeg_compress image.bmp` will result in the image.bmp being replaced with image.cjpg.
+ 
+ 
+ When there is no file given as arguments, it will read content from __stdin__ and output the result to __stdout__.
 
 ## 1. check dependencies.
 

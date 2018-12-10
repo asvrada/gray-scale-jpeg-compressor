@@ -1,19 +1,49 @@
 import argparse
 import os
+import sys
 
-from src.hw1.compressor import Compressor
+from src.hw1.compressor import Decompressor as cc
 
-parser = argparse.ArgumentParser(description="Sliding Window Decompressor by Zijie Wu\nExample usage:\ncli_file_decompress book1.txt ...", formatter_class=argparse.RawDescriptionHelpFormatter)
 
-parser.add_argument("files", help="Files to compress or decompress", nargs="*")
+def parse():
+    desc = """\
+Sliding Window Decompressor by Zijie Wu
+Example usage:
+    cli_file_decompress book1.txt.s ...
+"""
 
-argv = parser.parse_args()
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("files", help="Files to decompress", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
 
-input_files = argv.files
+    argv = parser.parse_args()
 
-c = Compressor()
+    files = argv.files
 
-print("Unzipping", input_files)
-for each in input_files:
-    c.decompress_to_file(each, each[:-2])
-    os.remove(each)
+    return files
+
+
+def decompress(files):
+    if type(files) is list:
+        # List of files
+        for file in files:
+            filename = file.name
+
+            # process file name
+            output_file = filename[:-2]
+
+            # compress with hw2
+            c = cc(file).run()
+            c.write_to_file(output_file)
+
+            # remove original file
+            os.remove(filename)
+    else:
+        # stdin
+        c = cc(files).run()
+        c.write_to_stdout()
+
+
+if __name__ == '__main__':
+    files = parse()
+
+    decompress(files)

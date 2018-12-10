@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import math
+import io
 
 from .huffman import *
 
@@ -378,13 +379,14 @@ def reverse_quantization(block, table):
     return block * table
 
 
-def load_image(path_image):
-    im = Image.open(path_image)
+def load_image(buffered_reader):
+    content = io.BytesIO(buffered_reader.read())
+    im = Image.open(content)
     pix = im.load()
     return pix, im
 
 
-def load_bitarray(path_data):
+def load_bitarray(buffer):
     """
     Load bitarray from file
 
@@ -393,10 +395,8 @@ def load_bitarray(path_data):
     :return: bitarray
     :rtype: bitarray
     """
-    f = open(path_data, "rb")
-
     ret = bitarray()
-    ret.fromfile(f)
+    ret.frombytes(buffer.read())
     return ret
 
 

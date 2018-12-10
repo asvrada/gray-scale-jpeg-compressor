@@ -1,23 +1,51 @@
 import argparse
 import os
+import sys
 
-from src.hw1.compressor import Compressor
+from src.hw1.compressor import Compressor as cc
 
-parser = argparse.ArgumentParser(description="Sliding Window Compressor by Zijie Wu\nExample usage:\ncli_file_compress book1.txt ...", formatter_class=argparse.RawDescriptionHelpFormatter)
 
-parser.add_argument("files", help="Files to compress or decompress", nargs="*")
-parser.add_argument("--size", type=int, help="Assign number of bits to sliding window\n9: 4K, 13: 64K", choices=[9, 13], metavar='size', default=9)
+def parse():
+    desc = """\
+Sliding Window Compressor by Zijie Wu
+Example usage:
+    cli_file_compress book1.txt ...
+"""
 
-argv = parser.parse_args()
+    parser = argparse.ArgumentParser(description=desc, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("files", help="Files to compress", nargs="*", default=sys.stdin.buffer, type=argparse.FileType('rb'))
+    parser.add_argument("--size", type=int, help="Assign number of bits to sliding window\n9: 4K, 13: 64K", choices=[9, 13], metavar='size', default=9)
 
-input_files = argv.files
-size = argv.size
+    argv = parser.parse_args()
 
-c = Compressor(size)
+    files = argv.files
+    size = argv.size
 
-print("Zipping")
-for each in input_files:
-    print(each)
-    c.compress_to_file(each, each + ".S")
-    # remove original file
-    os.remove(each)
+    return files, size
+
+
+def compress(files, size):
+    if type(files) is list:
+        # List of files
+        for file in files:
+            filename = file.name
+
+            # generate new file name
+            output_file = filename + ".s"
+
+            # compress with hw2
+            c = cc(file, size).run()
+            c.write_to_file(output_file)
+
+            # remove original file
+            os.remove(filename)
+    else:
+        # stdin
+        c = cc(files, size).run()
+        c.write_to_stdout()
+
+
+if __name__ == '__main__':
+    files, size = parse()
+
+    compress(files, size)
