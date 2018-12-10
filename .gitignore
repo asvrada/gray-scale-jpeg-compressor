@@ -3,6 +3,7 @@
 **/__pycache__
 output.bmp
 output/
+Kodak/
 **/.pytest_cache
 *.spec
 dist
