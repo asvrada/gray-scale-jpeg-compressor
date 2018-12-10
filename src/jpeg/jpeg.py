@@ -1,17 +1,19 @@
-from bitarray import bitarray
-from PIL import Image, ImageDraw
+from PIL import ImageDraw
 
 from .helper import *
 from .config import *
 
+import sys
+import io
+
 
 class Compressor:
-    def __init__(self, image_path, block_size=8, quality="low"):
+    def __init__(self, buffered_reader, block_size=8, quality="low"):
         """
         Create compressor object
 
-        :param image_path: path to the image
-        :type image_path: str
+        :param buffered_reader: Buffered Reader containing the content of the image
+        :type buffered_reader: io.BufferedReader
         :param block_size: size of each block before DCT, can be {8, 16}. Default to 8.
         :type block_size: int
         :param quality: Quality of compression, can be {"low", "medium" , "high"}. Default to "low".
@@ -38,7 +40,7 @@ class Compressor:
         self.__quality = quality
         self.__quantization_table = get_quantization_table(self.__block_size, self.__quality)
 
-        self.__pix, self.__im = load_image(image_path)
+        self.__pix, self.__im = load_image(buffered_reader)
         self.__result = bitarray()
 
     def run(self):
@@ -140,18 +142,19 @@ class Compressor:
         with open(path_output_file, "wb") as f:
             f.write(self.__result.tobytes())
 
-        return self
+    def write_to_stdout(self):
+        sys.stdout.buffer.write(self.__result.tobytes())
 
 
 class Decompressor:
-    def __init__(self, image_path):
+    def __init__(self, buffered_reader):
         """
         Create decompressor object
 
-        :param image_path: path to image
-        :type image_path: str
+        :param buffered_reader: path to image
+        :type buffered_reader: io.BufferedReader
         """
-        self.__array: bitarray = load_bitarray(image_path)
+        self.__array: bitarray = load_bitarray(buffered_reader)
         self.__pos: int = 0
 
         self.__im = None
@@ -250,4 +253,9 @@ class Decompressor:
 
     def write_to_file(self, path_output_file):
         self.__im.save(path_output_file, "bmp")
-        return self
+
+    def write_to_stdout(self):
+        with io.BytesIO() as output:
+            self.__im.save(output, "bmp")
+            contents = output.getvalue()
+            sys.stdout.buffer.write(contents)
