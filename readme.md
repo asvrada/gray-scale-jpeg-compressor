@@ -21,7 +21,7 @@ These scripts/utilities act like stand alone utilities. Where if a file is given
 
 ## 1. check dependencies.
 
-See file `requirements.txt`.
+See file `requirements.txt`. To install: `pip install -r requirements.txt`.
 
 * python >3.6
 * numpy
