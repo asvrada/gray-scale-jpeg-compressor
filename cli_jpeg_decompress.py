@@ -1,4 +1,6 @@
-from src.jpeg.jpeg import Decompressor as jc
+#!/usr/bin/env python
+
+from src.jpeg import Decompressor as jc
 
 import argparse
 import os

@@ -7,7 +7,6 @@
 
 A gray-scale image compressor, can only compress images in .bmp format.
 
-> The compressor from HW1 runs slowly.  
 > The default quality for JPEG compression is MEDIUM.
 
 # How to use
@@ -27,19 +26,12 @@ See file `requirements.txt`. To install: `pip install -r requirements.txt`.
 * numpy
 * PIL (Pillow implementation)
 * bitarray
-* PyInstaller
 
 ## 2. Use as python script
 
 ```bash
 # First:
 cd /path/to/this/repo/
-
-# There are four scripts:
-
-# lossless compress/decompress
-cli_file_compress.py
-cli_file_decompress.py
 
 # JPEG compress/decompress
 cli_jpeg_compress.py
@@ -48,25 +40,6 @@ cli_jpeg_decompress.py
 # To print help
 python cli_*.py -h
 
-```
-
-## 3 Use as stand alone utilities
-
-### How to build executable
-
-Make sure PyInstaller is installed first.
-
-```bash
-pyinstaller --onefile cli_file_compress.py
-pyinstaller --onefile cli_file_decompress.py
-pyinstaller --onefile cli_jpeg_compress.py
-pyinstaller --onefile cli_jpeg_decompress.py
-```
-
-### Use executable as standard utility
-
-```bash
-./dist/cli_jpeg_compress ...
 ```
 
 # Design
@@ -161,8 +134,3 @@ Do above steps in reverse order.
 * huffman.py: Involves huffman encoding/decoding
 * helper.py: A collections of functions that do specific things
 * config.py: Constants (like quantization table, huffman table) go there
-
-# Change log for HW1
-
-* Refactor the codes to work with stdin and stdout
-* Remove any printing
